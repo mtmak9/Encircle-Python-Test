@@ -1,0 +1,5 @@
+pysqlite3
+Pillow==9.2.0
+beautifulsoup4==4.11.1
+attrs==21.4.0
+requests==2.28.1
