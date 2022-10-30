@@ -32,6 +32,6 @@ Require the following information per tyre price:
 2. Type correct Tyre details: 1. Width, 2. Profile, 3. Size
 3. Click Start button to Fetch data and export Output with result to CSV file in same folder application exist
 
-*STOP button kill application or working script
+*STOP button kill application & working script
 
 
