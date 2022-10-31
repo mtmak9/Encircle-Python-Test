@@ -1,14 +1,13 @@
 import requests, threading, sqlite3
 from tkinter import *
-#from PIL import ImageTk, Image
 from bs4 import BeautifulSoup
 from csv import writer
-#from sys import argv
 from datetime import date
+#from PIL import ImageTk, Image
+#from sys import argv
 
 TODAY = date.today()
 POST_CODE = 'DN13QQ'
-# national.co.uk
 
 def dexel_co_uk():
     print('dexel.co.uk Run')
@@ -43,11 +42,43 @@ def dexel_co_uk():
             thewriter.writerow(result)
             print(result)
             #----DATABASE CONNECTION - script
-            # cursor.execute('INSERT INTO tyres VALUES (?, ?, ?, ?)', (NAME1, PRICE1, SIZE1, REVIEWS1))
+            # cursor.execute('INSERT INTO tyres VALUES (?, ?, ?, ?)', (NAME, PRICE, SIZE, REVIEWS))
             # db.commit()
     
-def blockcircles_com():
-    print('blockcircles.com Run')
+def blackcircles_com():
+    print('blackcircles.com Run')
+    
+    WIDTH_SIZE_GET = WIDTH_SIZE.get()
+    PROFILE_SIZE_GET = PROFILE_SIZE.get()
+    WHEEL_SIZE_GET = WHEEL_SIZE.get()
+    
+    URL = (f"https://www.blackcircles.com/tyres/{WIDTH_SIZE_GET}-{PROFILE_SIZE_GET}-{WHEEL_SIZE_GET}")
+    page = requests.get(URL)
+    bs = BeautifulSoup(page.content, 'html.parser')
+    lists = bs.find_all('div', class_='resBox')
+    
+    URL_NAME = URL_1_OPTION.get()
+    OUTPUT_NAME = (f"{URL_NAME}_{TODAY}_{WIDTH_SIZE_GET}-{PROFILE_SIZE_GET}-{WHEEL_SIZE_GET}.csv")
+    print(OUTPUT_NAME)
+    
+    with open(OUTPUT_NAME, 'w', encoding='utf8', newline='') as f:
+        thewriter = writer(f)
+        header = ['Name','Price','Size','Reviews']
+        thewriter.writerow(header)
+        
+        for list in lists:
+            NAME = list.find('a', class_ ='model-name').text.strip()
+            PRICE = list.find('div', class_='model-price').text
+            SIZE = list.find('p', class_='model-size').text
+            #REVIEWS = list.find('div a', class_ ='driverreviews-widget__rating-value')
+            
+            result = [NAME,PRICE,SIZE]
+            thewriter.writerow(result)
+            print(result)
+            
+            #----DATABASE CONNECTION - script
+            # cursor.execute('INSERT INTO tyres VALUES (?, ?, ?, ?)', (NAME, PRICE, SIZE, REVIEWS))
+            # db.commit()
 
 def national_co_uk():
     
@@ -81,7 +112,7 @@ def national_co_uk():
             print(result)
             
             #----DATABASE CONNECTION - script
-            # cursor.execute('INSERT INTO tyres VALUES (?, ?, ?, ?)', (NAME1, PRICE1, SIZE1, REVIEWS1))
+            # cursor.execute('INSERT INTO tyres VALUES (?, ?, ?, ?)', (NAME, PRICE, SIZE, REVIEWS))
             # db.commit()
 
 def START():
@@ -90,9 +121,8 @@ def START():
         threading.Thread(target=national_co_uk).start()
     elif URL_OPTION_CHECK == "dexel.co.uk":
         threading.Thread(target=dexel_co_uk).start()
-    elif URL_OPTION_CHECK == "blockcircles.com":
-        pass
-        #threading.Thread(target=).start()
+    elif URL_OPTION_CHECK == "blackcircles.com":
+        threading.Thread(target=blackcircles_com).start()
         
 def STOP():
     exit()
@@ -101,8 +131,8 @@ def STOP():
 def GUI():
     URL_OPTION = [
         "national.co.uk",
-        "blockcircles.com",
-        "dexel.co.uk", 
+        "blackcircles.com",
+        #"dexel.co.uk", 
     ]
     
     #---image
@@ -119,6 +149,9 @@ def GUI():
     URL_1_FRAME = LabelFrame(main_frame, text='Service:',fg='#ffcf4f', bg="#0b5394",  labelanchor=N, font=all_fonts)
     URL_1_FRAME.pack(pady=10,padx=15)
     
+    #_______________________________________________________
+    
+    #DROP MENU
     global URL_1_OPTION
     URL_1_OPTION = StringVar()
     URL_1_OPTION.set(URL_OPTION[0])
@@ -133,23 +166,17 @@ def GUI():
     SIZE_TYRE_FRAME = LabelFrame(main_frame, text='Size:',fg='#ffcf4f', bg="#0b5394", labelanchor=N, font=all_fonts)
     SIZE_TYRE_FRAME.pack(padx=15,pady=10)
 
-    #SIZE TYRE Entry field
-    #SIZE_TYRE_ENTRY = 
+    #WIDTH TYRE
     global WIDTH_SIZE
     Entry(SIZE_TYRE_FRAME, textvariable=WIDTH_SIZE, width=7).grid(row=0, column=0,padx=5,pady=10)
-    #SIZE_TYRE_ENTRY.pack(pady=10,padx=5,side='left')
     
-    #SIZE TYRE Entry field
-    #SIZE_TYRE_ENTRY =
+    #PROFILE TYRE
     global PROFILE_SIZE 
     Entry(SIZE_TYRE_FRAME, textvariable=PROFILE_SIZE, width=7).grid(row=0,column=1,padx=5,pady=10)
-    #SIZE_TYRE_ENTRY.pack(pady=10,padx=5,side='top')
     
-    #SIZE TYRE Entry field
-    #SIZE_TYRE_ENTRY = 
+    #WHEEL TYRE
     global WHEEL_SIZE
     Entry(SIZE_TYRE_FRAME, textvariable=WHEEL_SIZE, width=7).grid(row=0,column=2,padx=5,pady=10)
-    #SIZE_TYRE_ENTRY.pack(pady=10,padx=5,side='right')
 
     #_______________________________________________________
 
@@ -168,7 +195,7 @@ def GUI():
 
 if __name__ == '__main__':
     
-#---DATABASE SETTING&SCRIPT--------------
+#---DATABASE SETTING & SCRIPT--------------
     # db = sqlite3.connect('database.db')
     # cursor = db.cursor()
 
@@ -176,18 +203,6 @@ if __name__ == '__main__':
     #     cursor.execute("CREATE TABLE tyres (name, price, size, reviews)")
     #     quit()
 #________________________________________    
-        
-    # for num_width in range(120,300, +5):
-    #     print("WHEEL WIDTH____")
-    #     print(num_width)
-        
-    # for num_profile in range(30,90, +5):
-    #     print("WHEEL PROFILE__")
-    #     print(num_profile)
-        
-    # for num_size in range(15,20):
-    #     print("RIM SIZE_______")
-    #     print(num_size)
     
     #-- GUI settings
     root=Tk()
